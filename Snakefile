@@ -54,7 +54,8 @@ rule salmon:
     output:
         'output/020_salmon/{sample}/quant.sf'
     params:
-        index = 'output/005_index'
+        index = 'output/005_index',
+        outdir = 'output/020_salmon/{sample}'
     log:
         'output/logs/salmon.{sample}.log'
     threads:
@@ -67,7 +68,7 @@ rule salmon:
         '--index {params.index} '
         '--mates1 {input.r1} '
         '--mates2 {input.r2} '
-        '--output {output} '
+        '--output {params.outdir} '
         '--threads {threads} '
         '--validateMappings '
         '--gcBias '
