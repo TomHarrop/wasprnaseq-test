@@ -47,8 +47,8 @@ rule all:
 # quantify
 rule salmon:
     input:
-        'output/005_index/sa.bin',
-        'output/005_index/hash.bin',
+        'output/005_index/seq.bin',
+        'output/005_index/pos.bin',
         r1 = 'output/010_process/{sample}.r1.fastq',
         r2 = 'output/010_process/{sample}.r2.fastq'
     output:
@@ -139,12 +139,12 @@ rule generate_index:
         transcriptome = 'output/000_ref/gentrome.fa',
         decoys = 'output/000_ref/decoys.txt'
     output:
-        'output/005_index/sa.bin',
-        'output/005_index/hash.bin'
+        'output/005_index/seq.bin',
+        'output/005_index/pos.bin'
     params:
         outdir = 'output/005_index'
     log:
-        'output/logsgenerate_index.log'
+        'output/logs/generate_index.log'
     threads:
         workflow.cores
     singularity:
