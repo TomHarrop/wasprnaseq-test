@@ -24,7 +24,6 @@ ref = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.fna'
 gff = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff'
 mrna = 'output/000_ref/vvulg.mrna.fa'
 
-
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
 bioconductor = 'shub://TomHarrop/r-containers:bioconductor_3.11'
@@ -32,6 +31,7 @@ gffread = 'shub://TomHarrop/assembly-utils:gffread_0.12.3'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
 samtools = 'shub://TomHarrop/align-utils:samtools_1.10'
+
 
 #########
 # RULES #
