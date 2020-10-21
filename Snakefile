@@ -21,8 +21,8 @@ def get_reads(wildcards):
 pepfile: 'data/config.yaml'
 
 # references
-ref = 'data/ref/Vvulg_24_August_2020.assembly.annotated.fna'
-gff = 'data/ref/Vvulg_23_June_2020.gff3'
+ref = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.fna'
+gff = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff'
 mrna = 'output/000_ref/vvulg.mrna.fa'
 
 
