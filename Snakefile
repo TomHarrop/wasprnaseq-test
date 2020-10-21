@@ -6,11 +6,12 @@
 #############
 
 def get_reads(wildcards):
+    my_pep = pep.get_sample(wildcards.sample)
     return {
-        'l2r1': pep.get_sample(wildcards.sample).l2r1,
-        'l2r2': pep.get_sample(wildcards.sample).l2r2,
-        'l3r1': pep.get_sample(wildcards.sample).l3r1,
-        'l3r2': pep.get_sample(wildcards.sample).l3r2}
+        'l2r1': my_pep.l2r1,
+        'l2r2': my_pep.l2r2,
+        'l3r1': my_pep.l3r1,
+        'l3r2': my_pep.l3r2}
 
 
 ###########
@@ -19,6 +20,7 @@ def get_reads(wildcards):
 
 # samples
 pepfile: 'data/config.yaml'
+all_samples = pep.sample_table['sample_name']
 
 # references
 ref = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.fna'
@@ -38,6 +40,9 @@ samtools = 'shub://TomHarrop/align-utils:samtools_1.10'
 # RULES #
 #########
 
+wildcard_constraints:
+    sample = '|'.join(all_samples)
+
 rule all:
     input:
         'output/030_deseq/dds.Rds'
@@ -46,7 +51,7 @@ rule all:
 rule generate_deseq_object:
     input:
         quant_files = expand('output/020_salmon/{sample}/quant.sf',
-                             sample=pep.sample_table['sample_name']),
+                             sample=all_samples),
         gff = gff
     output:
         'output/030_deseq/dds.Rds'

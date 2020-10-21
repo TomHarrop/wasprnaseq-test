@@ -4,7 +4,7 @@ sample_modifiers:
   derive:
     attributes: [l2r1, l2r2, l3r1, l3r2]
     sources:
-      data1: "data/reads/CE7LPANXX-{ogf_lib_id}_S*_L002_R1_001.fastq.gz"
-      data2: "data/reads/CE7LPANXX-{ogf_lib_id}_S*_L002_R2_001.fastq.gz"
-      data3: "data/reads/CE7LPANXX-{ogf_lib_id}_S*_L003_R1_001.fastq.gz"
-      data4: "data/reads/CE7LPANXX-{ogf_lib_id}_S*_L003_R2_001.fastq.gz"
+      data1: "data/reads/CE7LPANXX-{ogf_lib_id}_S{ogf_sample_number}_L002_R1_001.fastq.gz"
+      data2: "data/reads/CE7LPANXX-{ogf_lib_id}_S{ogf_sample_number}_L002_R2_001.fastq.gz"
+      data3: "data/reads/CE7LPANXX-{ogf_lib_id}_S{ogf_sample_number}_L003_R1_001.fastq.gz"
+      data4: "data/reads/CE7LPANXX-{ogf_lib_id}_S{ogf_sample_number}_L003_R2_001.fastq.gz"
