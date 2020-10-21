@@ -6,12 +6,9 @@
 #############
 
 def get_reads(wildcards):
-    my_pep = pep.get_sample(wildcards.sample)
-    return {
-        'l2r1': my_pep.l2r1,
-        'l2r2': my_pep.l2r2,
-        'l3r1': my_pep.l3r1,
-        'l3r2': my_pep.l3r2}
+    input_keys = ['l2r1', 'l2r2', 'l3r1', 'l3r2']
+    my_pep = pep.get_sample(wildcards.sample).to_dict()
+    return {k: my_pep[k] for k in input_keys}
 
 
 ###########
@@ -126,7 +123,6 @@ rule check_pairing:
         r2 = 'output/010_process/{sample}.joined.r2.fastq',
     output:
         pipe = pipe('output/010_process/{sample}.repair.fastq')
-        # pipe = 'output/010_process/{sample}.repair.fastq'
     log:
         'output/logs/{sample}_repair.txt'
     threads:
