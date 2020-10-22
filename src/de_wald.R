@@ -1,6 +1,14 @@
 #!/usr/bin/env Rscript
 
-library(deseq2)
+log <- file(snakemake@log[[1]],
+            open = "wt")
+sink(log,
+     type = "message")
+sink(log,
+     append = TRUE,
+     type = "output")
+
+library(DESeq2)
 library(data.table)
 library(ggplot2)
 library(scales)
