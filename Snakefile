@@ -42,9 +42,23 @@ wildcard_constraints:
 
 rule all:
     input:
-        'output/030_deseq/dds.Rds'
+        'output/030_deseq/wald/res.csv'
 
 # DE analysis
+rule de_wald:
+    input:
+        dds = 'output/030_deseq/dds.Rds',
+    params:
+        alpha = 0.1,
+        lfc_threshold = 0.585   # log(1.5, 2)
+    output:
+        ma = 'output/030_deseq/wald/ma.pdf',
+        res = 'output/030_deseq/wald/res.csv'
+    container:
+        bioconductor
+    script:
+        'src/de_wald.R'
+
 rule generate_deseq_object:
     input:
         quant_files = expand('output/020_salmon/{sample}/quant.sf',
