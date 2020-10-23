@@ -26,7 +26,9 @@ mrna = 'output/000_ref/vvulg.mrna.fa'
 
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
-bioconductor = 'shub://TomHarrop/r-containers:bioconductor_3.11'
+bioconductor = ('shub://TomHarrop/r-containers:bioconductor_3.11'
+                '@4fcda9d03ac6b39e038b0d09e67629faa4ca8362')    # has apeglm
+# bioconductor = 'shub://TomHarrop/r-containers:bioconductor_3.11'
 gffread = 'shub://TomHarrop/assembly-utils:gffread_0.12.3'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
@@ -42,7 +44,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        'output/030_deseq/wald/res.csv'
+        'output/030_deseq/wald/res.annot.csv',
 
 # DE analysis
 rule de_wald:
@@ -54,6 +56,10 @@ rule de_wald:
     output:
         ma = 'output/030_deseq/wald/ma.pdf',
         res = 'output/030_deseq/wald/res.csv'
+    log:
+        'output/logs/de_wald.log'
+    threads:
+        min(16, workflow.cores)
     container:
         bioconductor
     script:
@@ -162,6 +168,20 @@ rule join_reads:
         'zcat {input.l2r2} {input.l3r2} >> {output.r2} & '
         'wait'
 
+# generic annotation rule
+rule annot_res:
+    input:
+        res = '{path}/{file}.csv',
+        annot = 'output/000_ref/annot.csv'
+    output:
+        res_annot = '{path}/{file}.annot.csv'
+    log:
+        'output/logs/annot_res.{path}.{file}.log'
+    container:
+        bioconductor
+    script:
+        'src/annot_res.R'
+
 
 # process the reference
 rule generate_index:
@@ -245,3 +265,16 @@ rule faidx:
         samtools
     shell:
         'samtools faidx {input}'
+
+rule parse_annotations:
+    input:
+        gff = gff
+    output:
+        annot = 'output/000_ref/annot.csv'
+    log:
+        'output/logs/parse_annotations.log'
+    container:
+        bioconductor
+    script:
+        'src/parse_annotations.R'
+
