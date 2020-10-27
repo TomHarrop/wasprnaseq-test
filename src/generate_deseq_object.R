@@ -10,58 +10,61 @@ sink(log,
 
 library(data.table)
 library(DESeq2)
-library(rtracklayer)
-library(tximport)
+library(tximeta)
 
-
+transcript_file <- snakemake@input[["mrna"]]
+gff_file <- snakemake@input[["gff"]]
 file_list <- snakemake@input[["quant_files"]]
-gff <- snakemake@input[["gff"]]
-dds_file <- snakemake@output[[1]]
+index_dir <- snakemake@params[["index"]]
+dds_file <- snakemake@output[["dds"]]
 
 # dev
-# gff <- "data/ref/Vvulg_23_June_2020.gff3"
+# transcript_file <- "output/000_ref/vvulg.mrna.fa"                 # mrna
+# gff_file <- "data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff"   # gff
+# index_dir <- "output/005_index"
 # file_list <- list.files("output/020_salmon",
 #                         full.names = TRUE,
 #                         recursive = TRUE,
 #                         pattern = "quant.sf")
 
+# generate the txome
+genome_name <- sub("_genomic.gff", "", basename(gff_file))
+tmp <- tempdir()
 
-# read gff using GenomicRanges
-gr <- import.gff3(gff,
-                  feature.type = c("exons", "CDS", "mRNA", "gene"))
+json_file <- file.path(tmp, paste0(genome_name, ".json"))
 
-# extract a data.frame of tx to gene
-mrnas <- gr[gr$type == "mRNA",]
-mrna_dt <- as.data.table(mcols(mrnas))
-tx2gene <- data.frame(mrna_dt[, .(TXNAME = ID,
-                                  GENEID = as.character(Parent))])
-
-# get file list
-names(file_list) <- gsub(".*/", "", dirname(file_list))
-
-# import quant files
-txi <- tximport(file_list, type = "salmon", tx2gene = tx2gene)
-
-# which stuff isn't in tx2gene?
-read_list <- lapply(file_list, fread)
-reads <- rbindlist(read_list, idcol = "sample")
-missing_genes <- reads[!Name %in% tx2gene$TXNAME, unique(Name)]
+setTximetaBFC(tmp)
+makeLinkedTxome(indexDir = index_dir,
+                source = "ncbi",       # should be RefSeq but NCBI hasn't posted genome info
+                organism = "Vespula vulgaris",
+                release = "1",
+                genome = genome_name,
+                fasta = transcript_file,
+                gtf = gff_file,
+                jsonFile = json_file)
 
 # generate col_data
-col_data <- data.table(samplename = names(file_list))
+names(file_list) <- gsub(".*/", "", dirname(file_list))
+col_data <- data.table(
+  files = file_list,
+  names = names(file_list))
 col_data[, splitname := gsub("^(n[[:digit:]]+)([d|f])([[:digit:]]+)",
-                "\\1_\\2_\\3",
-                samplename)]
+                             "\\1_\\2_\\3",
+                             names)]
 col_data[, c("nest", "caste", "indiv") := tstrsplit(splitname, "_")]
 col_data[, splitname := NULL]
 
-# generate DESeq object
-dds <- DESeqDataSetFromTximport(
-  txi,
-  colData = data.frame(col_data, row.names = 'samplename'),
-  design = ~ nest + caste
-)
+# read the salmon info
+se <- tximeta(col_data)
 
+# summarize counts to gene-level
+gse <- summarizeToGene(se)
+
+# generate deseq object
+dds <- DESeqDataSet(gse,
+                    design = ~ nest + caste )
+
+# write output
 saveRDS(dds, dds_file)
 
 # log
