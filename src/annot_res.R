@@ -13,6 +13,10 @@ library(data.table)
 annot_file <- snakemake@input[["annot"]]
 res_file <- snakemake@input[["res"]]
 
+# dev
+# annot_file <- "output/000_ref/annot.csv"
+# res_file <- "test/wald.csv"
+
 annot <- fread(annot_file)
 res <- fread(res_file)
 

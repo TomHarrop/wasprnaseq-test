@@ -69,16 +69,18 @@ rule generate_deseq_object:
     input:
         quant_files = expand('output/020_salmon/{sample}/quant.sf',
                              sample=all_samples),
-        gff = gff
+        gff = gff,
+        mrna = mrna
     output:
         'output/030_deseq/dds.Rds'
+    params:
+        index = 'output/005_index',
     log:
         'output/logs/generate_deseq_object.log'
     singularity:
         bioconductor
     script:
         'src/generate_deseq_object.R'
-
 
 # quantify
 rule salmon:
@@ -208,32 +210,26 @@ rule generate_index:
         '&> {log}'
 
 
-rule generate_decoy_trancriptome:
+rule generate_gentrome:
     input:
         fasta = ref,
-        transcriptome = mrna,
-        gff = gff
+        transcriptome = mrna
     output:
         'output/000_ref/gentrome.fa',
-        'output/000_ref/decoys.txt'
-    params:
-        outdir = 'output/000_ref'
-    log:
-        'output/logs/generate_decoy_trancriptome.log'
-    threads:
-        workflow.cores
-    singularity:
-        salmontools
+    container:
+        salmon
     shell:
-        'generateDecoyTranscriptome.sh '
-        '-j {threads} '
-        '-b /usr/bin/bedtools '
-        '-m /usr/local/bin/mashmap '
-        '-a {input.gff} '
-        '-g {input.fasta} '
-        '-t {input.transcriptome} '
-        '-o {params.outdir} '
-        '&> {log}'
+        'cat {input.transcriptome} {input.fasta} > {output}'
+
+rule generate_decoys:
+    input:
+        f'{ref}.fai'
+    output:
+        temp('output/000_ref/decoys.txt')
+    container:
+        salmon
+    shell:
+        'cut -f1 {input} > {output}'
 
 rule gffread:
     input:
