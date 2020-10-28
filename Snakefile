@@ -314,7 +314,7 @@ rule fastqc:
     input:
         unpack(get_fastqc_reads)
     output:
-        'output/015_fastqc/{type}/{sample}_fastqc.html'
+        'output/015_fastqc/{type}/{sample}.fastqc'
     params:
         outdir = 'output/015_fastqc/{type}'
     log:
@@ -328,5 +328,6 @@ rule fastqc:
         '--threads {threads} '
         '-o {params.outdir} '
         '{input.r1} {input.r2} '
-        '&> {log}'
+        '&> {log} '
+        '; touch {output}'
 
