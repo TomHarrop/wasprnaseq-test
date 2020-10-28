@@ -26,9 +26,7 @@ lfc_threshold <- log(1.5, 2)
 dds <- readRDS(dds_file)
 
 # filter genes with low expression
-row_means <- rowMeans(counts(dds))
-row_max <- rowMax(counts(dds))
-keep_genes <- (row_means > 5 | row_max > 10)
+keep_genes <- rowSums(counts(dds) >= 10) >= 3
 
 dds_filtered <- dds[keep_genes,]
 design(dds_filtered) <- ~ caste
@@ -52,5 +50,5 @@ de_res_by_nest[which.min(padj)]
 de_res_by_nest[order(padj)]
 
 
-plotCounts(dds, "gene-HZH66_001581", intgroup = c("nest", "caste"))
+plotCounts(dds, "HZH66_001581", intgroup = c("nest", "caste"))
  

@@ -15,7 +15,7 @@ res_file <- snakemake@input[["res"]]
 
 # dev
 # annot_file <- "output/000_ref/annot.csv"
-# res_file <- "test/wald.csv"
+# res_file <- "output/030_deseq/wald/res.csv"
 
 annot <- fread(annot_file)
 res <- fread(res_file)
@@ -23,7 +23,7 @@ res <- fread(res_file)
 res_annot <- merge(res,
                    annot,
                    by.x = "row",
-                   by.y = "gene",
+                   by.y = "locus_tag",
                    all.x = TRUE,
                    all.y = FALSE)
 res_annot[, abs_l2fc := abs(log2FoldChange)]

@@ -27,8 +27,7 @@ mrna = 'output/000_ref/vvulg.mrna.fa'
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
 bioconductor = ('shub://TomHarrop/r-containers:bioconductor_3.11'
-                '@4fcda9d03ac6b39e038b0d09e67629faa4ca8362')    # has apeglm
-# bioconductor = 'shub://TomHarrop/r-containers:bioconductor_3.11'
+                '@ae3e49fbdb6c7a9a05fc5b88cc55ac3663b40036')    # has tximeta
 gffread = 'shub://TomHarrop/assembly-utils:gffread_0.12.3'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
@@ -72,7 +71,7 @@ rule generate_deseq_object:
         gff = gff,
         mrna = mrna
     output:
-        'output/030_deseq/dds.Rds'
+        dds = 'output/030_deseq/dds.Rds'
     params:
         index = 'output/005_index',
     log:

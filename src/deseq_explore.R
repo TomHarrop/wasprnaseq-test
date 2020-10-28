@@ -22,9 +22,7 @@ dds_file <- "output/030_deseq/dds.Rds"
 dds <- readRDS(dds_file)
 
 # filter genes with low expression
-row_means <- rowMeans(counts(dds))
-row_max <- rowMax(counts(dds))
-keep_genes <- (row_means > 5 | row_max > 10)
+keep_genes <- rowSums(counts(dds) >= 10) >= 3
 
 dds_filtered <- dds[keep_genes,]
 # run DESeq2
@@ -76,5 +74,5 @@ res_dt <- data.table(results(dds_filtered,
 
 res_dt[order(abs(log2FoldChange), decreasing = TRUE)]
 
-plotCounts(dds_filtered, "gene-HZH66_009572", intgroup = c("nest", "caste"))
+plotCounts(dds_filtered, "HZH66_007326", intgroup = c("nest", "caste"))
 

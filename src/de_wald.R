@@ -97,10 +97,10 @@ lfc_threshold <- snakemake@params[["lfc_threshold"]]
 # dev
 # BiocParallel::register(
 #   BiocParallel::MulticoreParam(workers = 8))
-# dds_file <- "test/dds_tximeta.Rds"
+# dds_file <- "output/030_deseq/dds.Rds"
 # alpha <- 0.1
 # lfc_threshold <- log(1.5, 2)
-# wald_file <- "test/wald.csv"
+# wald_file <- "output/030_deseq/wald/res.csv"
 
 
 ########
@@ -111,9 +111,13 @@ lfc_threshold <- snakemake@params[["lfc_threshold"]]
 dds <- readRDS(dds_file)
 
 # filter genes with low expression
-row_means <- rowMeans(counts(dds))
-row_max <- rowMax(counts(dds))
-keep_genes <- (row_means > 5 | row_max > 10)
+# row_means <- rowMeans(counts(dds))
+# row_max <- rowMax(counts(dds))
+# keep_genes <- (row_means > 5 | row_max > 10)
+
+# at least 3 samples with a count of 10 or higher
+# chucks out a handful more genes
+keep_genes <- rowSums(counts(dds) >= 10) >= 3
 
 dds_filtered <- dds[keep_genes,]
 
@@ -182,9 +186,11 @@ gp <- ggplot(all_ma, aes(x = mean,
     trans = "log10",
     labels = trans_format("log10", math_format(10^.x)),
     breaks = trans_breaks("log10", function(x) 10^x)) +
+  geom_hline(yintercept = c(lfc_threshold, -lfc_threshold),
+             linetype = 2) +
   geom_point(shape = 16, alpha = 0.5, size = 1)
 
-ggsave(ma_file,
+# ggsave(ma_file,
        gp,
        width = 16,
        height = 9,
