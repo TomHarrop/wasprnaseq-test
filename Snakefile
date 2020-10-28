@@ -288,7 +288,7 @@ rule parse_annotations:
 # fastqc
 rule multiqc:
     input:
-        expand('output/015_fastqc/{type}/{sample}_fastqc.html',
+        expand('output/015_fastqc/{type}/{sample}.fastqc',
                type=[
                     'raw',
                     'processed'
