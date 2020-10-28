@@ -190,7 +190,7 @@ gp <- ggplot(all_ma, aes(x = mean,
              linetype = 2) +
   geom_point(shape = 16, alpha = 0.5, size = 1)
 
-# ggsave(ma_file,
+ggsave(ma_file,
        gp,
        width = 16,
        height = 9,
