@@ -57,6 +57,11 @@ col_data[, splitname := NULL]
 # read the salmon info
 se <- tximeta(col_data)
 
+# mapping info (don't run)
+# metadata(se)[["quantInfo"]]$percent_mapped
+# metadata(se)[["quantInfo"]]
+# metadata(se)[["quantInfo"]]$num_decoy_fragments / metadata(se)[["quantInfo"]]$num_processed * 100
+
 # summarize counts to gene-level
 gse <- summarizeToGene(se)
 

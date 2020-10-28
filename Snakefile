@@ -28,6 +28,7 @@ mrna = 'output/000_ref/vvulg.mrna.fa'
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
 bioconductor = ('shub://TomHarrop/r-containers:bioconductor_3.11'
                 '@ae3e49fbdb6c7a9a05fc5b88cc55ac3663b40036')    # has tximeta
+fastqc = 'docker://biocontainers/fastqc:v0.11.9_cv7'
 gffread = 'shub://TomHarrop/assembly-utils:gffread_0.12.3'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
@@ -162,8 +163,8 @@ rule join_reads:
     input:
         unpack(get_reads)
     output:
-        r1 = pipe('output/010_process/{sample}.joined.r1.fastq'),
-        r2 = pipe('output/010_process/{sample}.joined.r2.fastq'),
+        r1 = temp('output/010_process/{sample}.joined.r1.fastq'),
+        r2 = temp('output/010_process/{sample}.joined.r2.fastq'),
     shell:
         'zcat {input.l2r1} {input.l3r1} >> {output.r1} & '
         'zcat {input.l2r2} {input.l3r2} >> {output.r2} & '
@@ -272,4 +273,42 @@ rule parse_annotations:
         bioconductor
     script:
         'src/parse_annotations.R'
+
+# fastqc
+def get_fastqc_reads(wildcards):
+    if wildcards.type == 'raw':
+        return {'r1': 'output/010_process/{sample}.joined.r1.fastq',
+                'r2': 'output/010_process/{sample}.joined.r2.fastq'}
+    elif wildcards.type == 'processed':
+        return {'r1': 'output/010_process/{sample}.r1.fastq',
+                'r2': 'output/010_process/{sample}.r2.fastq'}
+
+rule fastqc_target:
+    input:
+        expand('output/015_fastqc/{type}/{sample}',
+               type=[
+                    # 'raw',
+                    'processed'
+                    ],
+               sample=all_samples)
+
+rule fastqc:
+    input:
+        unpack(get_fastqc_reads)
+    output:
+        directory('output/015_fastqc/{type}/{sample}')
+    params:
+        outdir = 'output/015_fastqc/{type}'
+    log:
+        'output/logs/fastqc.{sample}.{type}.log'
+    threads:
+        2
+    container:
+        fastqc
+    shell:
+        'fastqc '
+        '--threads {threads} '
+        '-o {params.outdir} '
+        '{input.r1} {input.r2} '
+        '&> {log}'
 
