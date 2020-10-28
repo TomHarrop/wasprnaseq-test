@@ -5,6 +5,15 @@
 # FUNCTIONS #
 #############
 
+def get_fastqc_reads(wildcards):
+    if wildcards.type == 'raw':
+        return {'r1': 'output/010_process/{sample}.joined.r1.fastq',
+                'r2': 'output/010_process/{sample}.joined.r2.fastq'}
+    elif wildcards.type == 'processed':
+        return {'r1': 'output/010_process/{sample}.r1.fastq',
+                'r2': 'output/010_process/{sample}.r2.fastq'}
+
+
 def get_reads(wildcards):
     input_keys = ['l2r1', 'l2r2', 'l3r1', 'l3r2']
     my_pep = pep.get_sample(wildcards.sample).to_dict()
@@ -30,6 +39,7 @@ bioconductor = ('shub://TomHarrop/r-containers:bioconductor_3.11'
                 '@ae3e49fbdb6c7a9a05fc5b88cc55ac3663b40036')    # has tximeta
 fastqc = 'docker://biocontainers/fastqc:v0.11.9_cv7'
 gffread = 'shub://TomHarrop/assembly-utils:gffread_0.12.3'
+multiqc = 'docker://ewels/multiqc:1.9'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
 samtools = 'shub://TomHarrop/align-utils:samtools_1.10'
@@ -45,6 +55,7 @@ wildcard_constraints:
 rule all:
     input:
         'output/030_deseq/wald/res.annot.csv',
+        'output/017_multiqc/multiqc_report.html'
 
 # DE analysis
 rule de_wald:
@@ -275,28 +286,35 @@ rule parse_annotations:
         'src/parse_annotations.R'
 
 # fastqc
-def get_fastqc_reads(wildcards):
-    if wildcards.type == 'raw':
-        return {'r1': 'output/010_process/{sample}.joined.r1.fastq',
-                'r2': 'output/010_process/{sample}.joined.r2.fastq'}
-    elif wildcards.type == 'processed':
-        return {'r1': 'output/010_process/{sample}.r1.fastq',
-                'r2': 'output/010_process/{sample}.r2.fastq'}
-
-rule fastqc_target:
+rule multiqc:
     input:
-        expand('output/015_fastqc/{type}/{sample}',
+        expand('output/015_fastqc/{type}/{sample}_fastqc.html',
                type=[
-                    # 'raw',
+                    'raw',
                     'processed'
                     ],
+               sample=all_samples),
+        expand('output/020_salmon/{sample}/quant.sf',
                sample=all_samples)
+    output:
+        'output/017_multiqc/multiqc_report.html'
+    params:
+        outdir = 'output/017_multiqc'
+    log:
+        'output/logs/multiqc.log'
+    container:
+        multiqc
+    shell:
+        'multiqc '
+        '-o {params.outdir} '
+        'output '
+        '2> {log}'
 
 rule fastqc:
     input:
         unpack(get_fastqc_reads)
     output:
-        directory('output/015_fastqc/{type}/{sample}')
+        'output/015_fastqc/{type}/{sample}_fastqc.html'
     params:
         outdir = 'output/015_fastqc/{type}'
     log:
