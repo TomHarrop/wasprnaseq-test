@@ -31,7 +31,8 @@ all_samples = pep.sample_table['sample_name']
 # references
 ref = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.fna'
 gff = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff'
-mrna = 'output/000_ref/vvulg.mrna.fa'
+# mrna = 'output/000_ref/vvulg.mrna.fa'
+mrna = 'data/ref/Vespula_vulgaris.transcripts.fa'
 
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
@@ -55,7 +56,7 @@ wildcard_constraints:
 rule all:
     input:
         'output/030_deseq/wald/res.annot.csv',
-        'output/017_multiqc/multiqc_report.html'
+        # 'output/017_multiqc/multiqc_report.html'
 
 # DE analysis
 rule de_wald:
