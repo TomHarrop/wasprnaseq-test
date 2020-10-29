@@ -394,7 +394,7 @@ rule star_first_pass:
         '--genomeDir {params.genome_dir} '
         '--outSJfilterReads Unique '
         # '--outSAMtype None '          # troubleshoot gtf
-        '--outSAMtype SAM Unsorted '    # troubleshoot gtf
+        '--outSAMtype SAM '    # troubleshoot gtf
         '--quantMode GeneCounts '       # troubleshoot gtf
         '--readFilesIn {input.r1} {input.r2} '
         '--outFileNamePrefix {params.prefix} '
