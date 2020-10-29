@@ -393,6 +393,7 @@ rule star_first_pass:
         '--runThreadN {threads} '
         '--genomeDir {params.genome_dir} '
         '--outSJfilterReads Unique '
+        # '--outSAMtype None '  # troubleshoot gtf
         '--outSAMtype None '
         '--readFilesIn {input.r1} {input.r2} '
         '--outFileNamePrefix {params.prefix} '
@@ -421,7 +422,7 @@ rule star_index:
         '--sjdbGTFfile {input.gff} '
         '--genomeSAindexNbases 12 '
         '--sjdbGTFtagExonParentTranscript Parent '
-        # '--sjdbGTFtagExonParentGene locus_tag '
+        '--sjdbGTFtagExonParentGene locus_tag '
         # '--sjdbGTFtagExonParentGeneName Name '
         '&> {log}'
 
