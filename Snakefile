@@ -61,7 +61,8 @@ rule all:
     input:
         expand('output/030_deseq/wald/res.annot.{pl}.csv',
                pl=pipelines),
-        'output/017_multiqc/multiqc_report.html'
+        'output/017_multiqc/multiqc_report.html',
+        'output/025_star/feature_counts.summary.csv'
 
 # DE analysis
 rule de_wald:
@@ -352,6 +353,24 @@ rule fastqc:
 
 
 # test star mapping
+rule count_reads_per_feature:
+    input:
+        bam_files = expand(
+            'output/025_star/pass2/{sample}.Aligned.sortedByCoord.out.bam',
+            sample=all_samples),
+        gff = gff
+    output:
+        summary = 'output/025_star/feature_counts.summary.csv',
+        feature_counts = 'output/025_star/feature_counts.csv'
+    log:
+        'output/logs/count_reads_per_feature.R'
+    threads:
+        min(32, workflow.cores)
+    singularity:
+        bioconductor
+    script:
+        'src/count_reads_per_feature.R'
+
 rule star_second_pass:
     input:
         r1 = 'output/010_process/{sample}.r1.fastq',
