@@ -44,6 +44,7 @@ multiqc = 'docker://ewels/multiqc:1.9'
 salmon = 'docker://combinelab/salmon:1.3.0'
 salmontools = 'shub://TomHarrop/align-utils:salmontools_23eac84'
 samtools = 'shub://TomHarrop/align-utils:samtools_1.10'
+star = 'shub://TomHarrop/align-utils:star_2.7.6a'
 
 
 #########
@@ -197,7 +198,8 @@ rule annot_res:
         'src/annot_res.R'
 
 
-# process the reference
+
+
 rule generate_index:
     input:
         transcriptome = 'output/000_ref/gentrome.fa',
@@ -331,4 +333,95 @@ rule fastqc:
         '{input.r1} {input.r2} '
         '&> {log} '
         '; touch {output}'
+
+
+# test star mapping
+rule star_target:
+    input:
+        expand('output/025_star/pass2/{sample}.Aligned.sortedByCoord.out.bam',
+               sample=all_samples)
+
+rule star_second_pass:
+    input:
+        r1 = 'output/010_process/{sample}.r1.fastq',
+        r2 = 'output/010_process/{sample}.r2.fastq',
+        star_reference = 'output/007_star-index/SA',
+        junctions = expand('output/025_star/pass1/{sample}.SJ.out.tab',
+                           sample=all_samples)
+    output:
+        bam = 'output/025_star/pass2/{sample}.Aligned.sortedByCoord.out.bam',
+        counts = 'output/025_star/pass2/{sample}.ReadsPerGene.out.tab'
+    threads:
+        workflow.cores
+    params:
+        genome_dir = 'output/007_star-index',
+        prefix = 'output/025_star/pass2/{sample}.'
+    log:
+        'output/logs/star_second_pass.{sample}.log'
+    container:
+        star
+    shell:
+        'STAR '
+        '--runThreadN {threads} '
+        '--genomeDir {params.genome_dir} '
+        '--sjdbFileChrStartEnd {input.junctions} '
+        '--outSAMtype BAM SortedByCoordinate '
+        '--outReadsUnmapped Fastx '
+        '--quantMode GeneCounts '
+        '--readFilesIn {input.r1} {input.r2} '
+        '--outFileNamePrefix {params.prefix} '
+        '&> {log}'
+
+rule star_first_pass:
+    input:
+        r1 = 'output/010_process/{sample}.r1.fastq',
+        r2 = 'output/010_process/{sample}.r2.fastq',
+        star_reference = 'output/007_star-index/SA'
+    output:
+        sjdb = 'output/025_star/pass1/{sample}.SJ.out.tab'
+    threads:
+        workflow.cores
+    params:
+        genome_dir = 'output/007_star-index',
+        prefix = 'output/025_star/pass1/{sample}.'
+    log:
+        'output/logs/star_first_pass.{sample}.log'
+    container:
+        star
+    shell:
+        'STAR '
+        '--runThreadN {threads} '
+        '--genomeDir {params.genome_dir} '
+        '--outSJfilterReads Unique '
+        '--outSAMtype None '
+        '--readFilesIn {input.r1} {input.r2} '
+        '--outFileNamePrefix {params.prefix} '
+        '&> {log}'
+
+rule star_index:
+    input:
+        fasta = ref,
+        gff = gff
+    output:
+        'output/007_star-index/SA'
+    params:
+        outdir = 'output/007_star-index'
+    log:
+        'output/logs/star_index.log'
+    threads:
+        workflow.cores
+    container:
+        star
+    shell:
+        'STAR '
+        'runThreadN {threads} '
+        '--runMode genomeGenerate '
+        '--genomeDir {params.outdir} '
+        '--genomeFastaFiles {input.fasta} '
+        '--sjdbGTFfile {input.gff} '
+        '--genomeSAindexNbases 12 '
+        '--sjdbGTFtagExonParentTranscript Parent '
+        # '--sjdbGTFtagExonParentGene locus_tag '
+        # '--sjdbGTFtagExonParentGeneName Name '
+        '&> {log}'
 
