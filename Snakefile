@@ -61,7 +61,7 @@ rule all:
     input:
         expand('output/030_deseq/wald/res.annot.{pl}.csv',
                pl=pipelines),
-        # 'output/017_multiqc/multiqc_report.html'
+        'output/017_multiqc/multiqc_report.html'
 
 # DE analysis
 rule de_wald:
@@ -111,7 +111,6 @@ rule generate_deseq_object_star:
         bioconductor
     script:
         'src/generate_deseq_object.star.R'
-
 
 # quantify
 rule salmon:
@@ -313,6 +312,8 @@ rule multiqc:
                     ],
                sample=all_samples),
         expand('output/020_salmon/{sample}/quant.sf',
+               sample=all_samples),
+        expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
                sample=all_samples)
     output:
         'output/017_multiqc/multiqc_report.html'
@@ -351,11 +352,6 @@ rule fastqc:
 
 
 # test star mapping
-rule star_target:
-    input:
-        expand('output/025_star/pass2/{sample}.Aligned.sortedByCoord.out.bam',
-               sample=all_samples)
-
 rule star_second_pass:
     input:
         r1 = 'output/010_process/{sample}.r1.fastq',
