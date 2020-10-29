@@ -107,7 +107,7 @@ rule generate_deseq_object:
     singularity:
         bioconductor
     script:
-        'src/generate_deseq_object.{pl}.R'
+        f'src/generate_deseq_object.{wildcards.pl}.R'
 
 # quantify
 rule salmon:
