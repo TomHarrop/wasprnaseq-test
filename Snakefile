@@ -31,8 +31,8 @@ all_samples = pep.sample_table['sample_name']
 # references
 ref = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.fna'
 gff = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff'
-# mrna = 'output/000_ref/vvulg.mrna.fa'
-mrna = 'data/ref/Vespula_vulgaris.transcripts.fa'
+mrna = 'output/000_ref/vvulg.mrna.fa'
+# mrna = 'data/ref/Vespula_vulgaris.transcripts.fa'
 
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
@@ -393,9 +393,9 @@ rule star_first_pass:
         '--runThreadN {threads} '
         '--genomeDir {params.genome_dir} '
         '--outSJfilterReads Unique '
-        # '--outSAMtype None '          # troubleshoot gtf
-        '--outSAMtype SAM '    # troubleshoot gtf
-        '--quantMode GeneCounts '       # troubleshoot gtf
+        '--outSAMtype None '          # troubleshoot gtf
+        # '--outSAMtype SAM '               # troubleshoot gtf
+        # '--quantMode GeneCounts '       # troubleshoot gtf
         '--readFilesIn {input.r1} {input.r2} '
         '--outFileNamePrefix {params.prefix} '
         '&> {log}'
