@@ -56,27 +56,38 @@ wildcard_constraints:
 
 rule all:
     input:
-        'output/030_deseq/wald/res.annot.csv',
+        expand('output/030_deseq/wald/res.annot.{pl}.csv',
+               pl=['salmon', 'star']),
         # 'output/017_multiqc/multiqc_report.html'
 
 # DE analysis
 rule de_wald:
     input:
-        dds = 'output/030_deseq/dds.Rds',
+        dds = 'output/030_deseq/dds.{pl}.Rds',
     params:
         alpha = 0.1,
         lfc_threshold = 0.585   # log(1.5, 2)
     output:
-        ma = 'output/030_deseq/wald/ma.pdf',
-        res = 'output/030_deseq/wald/res.csv'
+        ma = 'output/030_deseq/wald/ma.{pl}.pdf',
+        res = 'output/030_deseq/wald/res.{pl}.csv'
     log:
-        'output/logs/de_wald.log'
+        'output/logs/de_wald.{pl}.log'
     threads:
         min(16, workflow.cores)
     container:
         bioconductor
     script:
         'src/de_wald.R'
+
+def pick_quant_files(wildcards):
+    if wildcards.pl == 'salmon':
+        return expand('output/020_salmon/{sample}/quant.sf',
+                      sample=all_samples),
+    elif wildcards.pl == 'star':
+        return expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
+                      sample=all_samples)
+    else:
+        raise ValueError(f'wtf {wildcards.pl}')
 
 rule generate_deseq_object:
     input:
@@ -85,15 +96,15 @@ rule generate_deseq_object:
         gff = gff,
         mrna = mrna
     output:
-        dds = 'output/030_deseq/dds.Rds'
+        dds = 'output/030_deseq/dds.{pl}.Rds'
     params:
         index = 'output/005_index',
     log:
-        'output/logs/generate_deseq_object.log'
+        'output/logs/generate_deseq_object.{pl}.log'
     singularity:
         bioconductor
     script:
-        'src/generate_deseq_object.R'
+        'src/generate_deseq_object.{wildcards.pl}.R'
 
 # quantify
 rule salmon:

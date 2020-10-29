@@ -97,10 +97,10 @@ lfc_threshold <- snakemake@params[["lfc_threshold"]]
 # dev
 # BiocParallel::register(
 #   BiocParallel::MulticoreParam(workers = 8))
-# dds_file <- "output/030_deseq/dds.Rds"
+# dds_file <- "test/star_dds.Rds"
 # alpha <- 0.1
 # lfc_threshold <- log(1.5, 2)
-# wald_file <- "output/030_deseq/wald/res.csv"
+# wald_file <- "test/star_res.csv"
 
 
 ########
