@@ -34,6 +34,8 @@ gff = 'data/ref/GCA_014466185.1_ASM1446618v1_genomic.gff'
 mrna = 'output/000_ref/vvulg.mrna.fa'
 # mrna = 'data/ref/Vespula_vulgaris.transcripts.fa'
 
+pipelines = ['salmon', 'star']
+
 # containers
 bbmap = 'shub://TomHarrop/seq-utils:bbmap_38.86'
 bioconductor = ('shub://TomHarrop/r-containers:bioconductor_3.11'
@@ -52,12 +54,13 @@ star = 'shub://TomHarrop/align-utils:star_2.7.6a'
 #########
 
 wildcard_constraints:
-    sample = '|'.join(all_samples)
+    sample = '|'.join(all_samples),
+    pl = '|'.join(pipelines)
 
 rule all:
     input:
         expand('output/030_deseq/wald/res.annot.{pl}.csv',
-               pl=['salmon', 'star']),
+               pl=pipelines),
         # 'output/017_multiqc/multiqc_report.html'
 
 # DE analysis
@@ -197,19 +200,16 @@ rule join_reads:
 # generic annotation rule
 rule annot_res:
     input:
-        res = '{path}/{file}.csv',
+        res = '{path}/{file}.{pl}.csv',
         annot = 'output/000_ref/annot.csv'
     output:
-        res_annot = '{path}/{file}.annot.csv'
+        res_annot = '{path}/{file}.annot.{pl}.csv'
     log:
-        'output/logs/annot_res.{path}.{file}.log'
+        'output/logs/annot_res.{path}.{file}.{pl}.log'
     container:
         bioconductor
     script:
         'src/annot_res.R'
-
-
-
 
 rule generate_index:
     input:
