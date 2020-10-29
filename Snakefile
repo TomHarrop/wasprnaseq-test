@@ -82,36 +82,36 @@ rule de_wald:
     script:
         'src/de_wald.R'
 
-def pick_quant_files(wildcards):
-    if wildcards.pl == 'salmon':
-        my_files = expand('output/020_salmon/{sample}/quant.sf',
-                          sample=all_samples)
-    elif wildcards.pl == 'star':
-        my_files = expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
-                          sample=all_samples)
-    else:
-        raise ValueError(f'wtf {wildcards.pl}')
-    return(my_files)
-
-rule generate_deseq_object:
+rule generate_deseq_object_salmon:
     input:
-        # quant_files = expand('output/020_salmon/{sample}/quant.sf',
-        #                      sample=all_samples),
-        quant_file = pick_quant_files,
+        quant_files = expand('output/020_salmon/{sample}/quant.sf',
+                             sample=all_samples),
         gff = gff,
         mrna = mrna
     output:
-        dds = 'output/030_deseq/dds.{pl}.Rds'
+        dds = 'output/030_deseq/dds.salmon.Rds'
     params:
-        index = 'output/005_index',
-        # script = 
-        script = lambda wildcards: f'src/generate_deseq_object.{wildcards.pl}.R'
+        index = 'output/005_index'
     log:
-        'output/logs/generate_deseq_object.{pl}.log'
+        'output/logs/generate_deseq_object.salmon.log'
     singularity:
         bioconductor
     script:
-        '{params.script}'
+        'src/generate_deseq_object.salmon.R'
+
+rule generate_deseq_object_star:
+    input:
+        quant_files = expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
+                             sample=all_samples)
+    output:
+        dds = 'output/030_deseq/dds.star.Rds'
+    log:
+        'output/logs/generate_deseq_object.star.log'
+    singularity:
+        bioconductor
+    script:
+        'src/generate_deseq_object.star.R'
+
 
 # quantify
 rule salmon:
