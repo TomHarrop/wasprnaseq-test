@@ -104,8 +104,8 @@ rule generate_deseq_object:
         dds = 'output/030_deseq/dds.{pl}.Rds'
     params:
         index = 'output/005_index',
-        # script = 'src/generate_deseq_object.{pl}.R'
-        script = lambda wildcards: print(wildcards.pl)
+        # script = 
+        script = lambda wildcards: f'src/generate_deseq_object.{wildcards.pl}.R'
     log:
         'output/logs/generate_deseq_object.{pl}.log'
     singularity:
