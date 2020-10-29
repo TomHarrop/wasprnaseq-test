@@ -102,12 +102,13 @@ rule generate_deseq_object:
         dds = 'output/030_deseq/dds.{pl}.Rds'
     params:
         index = 'output/005_index',
+        script = 'src/generate_deseq_object.{pl}.R'
     log:
         'output/logs/generate_deseq_object.{pl}.log'
     singularity:
         bioconductor
     script:
-        f'src/generate_deseq_object.{wildcards.pl}.R'
+        '{params.script}'
 
 # quantify
 rule salmon:
