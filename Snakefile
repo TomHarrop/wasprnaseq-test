@@ -84,18 +84,20 @@ rule de_wald:
 
 def pick_quant_files(wildcards):
     if wildcards.pl == 'salmon':
-        return expand('output/020_salmon/{sample}/quant.sf',
-                      sample=all_samples),
+        my_files = expand('output/020_salmon/{sample}/quant.sf',
+                          sample=all_samples)
     elif wildcards.pl == 'star':
-        return expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
-                      sample=all_samples)
+        my_files = expand('output/025_star/pass2/{sample}.ReadsPerGene.out.tab',
+                          sample=all_samples)
     else:
         raise ValueError(f'wtf {wildcards.pl}')
+    return(my_files)
 
 rule generate_deseq_object:
     input:
-        quant_files = expand('output/020_salmon/{sample}/quant.sf',
-                             sample=all_samples),
+        # quant_files = expand('output/020_salmon/{sample}/quant.sf',
+        #                      sample=all_samples),
+        quant_file = pick_quant_files,
         gff = gff,
         mrna = mrna
     output:
@@ -108,7 +110,7 @@ rule generate_deseq_object:
     singularity:
         bioconductor
     script:
-        '{params.script}'
+        '{wildcards.pl}'
 
 # quantify
 rule salmon:
