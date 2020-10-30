@@ -15,7 +15,7 @@ def get_fastqc_reads(wildcards):
 
 
 def get_reads(wildcards):
-    input_keys = ['l2r1', 'l2r2', 'l3r1', 'l3r2']
+    input_keys = ['r1', 'r2']
     my_pep = pep.get_sample(wildcards.sample).to_dict()
     return {k: my_pep[k] for k in input_keys}
 
@@ -197,8 +197,8 @@ rule join_reads:
         r1 = temp('output/010_process/{sample}.joined.r1.fastq'),
         r2 = temp('output/010_process/{sample}.joined.r2.fastq'),
     shell:
-        'zcat {input.l2r1} {input.l3r1} >> {output.r1} & '
-        'zcat {input.l2r2} {input.l3r2} >> {output.r2} & '
+        'zcat {input.r1} >> {output.r1} & '
+        'zcat {input.r2} >> {output.r2} & '
         'wait'
 
 # generic annotation rule
