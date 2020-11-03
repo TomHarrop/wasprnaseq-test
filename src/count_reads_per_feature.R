@@ -108,14 +108,18 @@ nuc_introns <- GenomicFeatures::intronicParts(nuclear_txdb,
 # https://support.bioconductor.org/p/73648/
 gen_features <- genFeatures(nuclear_txdb_with_rrna,
                             reduce_ranges = TRUE)
+
+mrna <- disjoin(gen_features$mRNA_red)
+mrna_gaps <- disjoin(gaps(mrna))
 intergenic <- disjoin(gen_features$intergenic)
-mrna_plus1kb <- disjoin(gen_features$mRNA_red + 500)
+mrna_plus1kb <- disjoin(mrna + 500)
 mrna_plus1kb_gaps <- disjoin(gaps(mrna_plus1kb))
 
 # list of things to count
 feature_list <- list(exons = nuc_exons,
                      introns = nuc_introns,
-                     mrna = disjoin(gen_features$mRNA_red),
+                     mrna = mrna,
+                     mrna_gaps <- mrna_gaps,
                      intergenic = intergenic,
                      mrna_plus1kb = mrna_plus1kb,
                      mrna_plus1kb_gaps = mrna_plus1kb_gaps)
