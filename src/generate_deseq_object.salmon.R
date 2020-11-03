@@ -48,11 +48,7 @@ names(file_list) <- gsub(".*/", "", dirname(file_list))
 col_data <- data.table(
   files = file_list,
   names = names(file_list))
-col_data[, splitname := gsub("^(n[[:digit:]]+)([d|f])([[:digit:]]+)",
-                             "\\1_\\2_\\3",
-                             names)]
-col_data[, c("nest", "caste", "indiv") := tstrsplit(splitname, "_")]
-col_data[, splitname := NULL]
+col_data[, c("caste", "indiv") := tstrsplit(names, "_")]
 
 # read the salmon info
 se <- tximeta(col_data)
@@ -67,7 +63,7 @@ gse <- summarizeToGene(se)
 
 # generate deseq object
 dds <- DESeqDataSet(gse,
-                    design = ~ nest + caste )
+                    design = ~ caste )
 
 # write output
 saveRDS(dds, dds_file)

@@ -40,16 +40,12 @@ setcolorder(count_dt, sample_order)
 col_data <- data.table(
   names = sample_order
 )
-col_data[, splitname := gsub("^(n[[:digit:]]+)([d|f])([[:digit:]]+)",
-                             "\\1_\\2_\\3",
-                             names)]
-col_data[, c("nest", "caste", "indiv") := tstrsplit(splitname, "_")]
-col_data[, splitname := NULL]
+col_data[, c("caste", "indiv") := tstrsplit(names, "_")]
 
 dds <- DESeqDataSetFromMatrix(
   countData = as.matrix(data.frame(count_dt, row.names = "V1")),
   colData = data.frame(col_data, row.names = "names"),
-  design = ~ nest + caste)
+  design = ~ caste)
 
 # write output
 saveRDS(dds, dds_file)

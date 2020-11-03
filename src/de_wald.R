@@ -136,7 +136,7 @@ dds_filtered <- DESeq(dds_filtered,
 # generate results for all pairwise contrasts
 coldt <- as.data.table(colData(dds_filtered),
                        keep.rownames = TRUE)
-coefs <- c("nest", "caste")
+coefs <- c("caste")
 contrast_res <- rbindlist(lapply(coefs, GetCoefContrasts))
 
 fwrite(contrast_res,
@@ -145,9 +145,9 @@ fwrite(contrast_res,
 # run once per results_names
 # first get the missing comparison
 dds_relevel <- copy(dds_filtered)
-dds_relevel$nest <- relevel(dds_relevel$nest,
-                            levels(dds_relevel$nest)[[
-                              length(levels(dds_relevel$nest))
+dds_relevel$caste <- relevel(dds_relevel$caste,
+                            levels(dds_relevel$caste)[[
+                              length(levels(dds_relevel$caste))
                             ]])
 dds_relevel <- DESeq(dds_relevel,
                      parallel = TRUE)
