@@ -363,7 +363,7 @@ rule count_reads_per_feature:
         # summary = 'output/025_star/feature_counts.summary.csv',
         feature_counts = 'output/025_star/feature_counts.csv'
     log:
-        'output/logs/count_reads_per_feature.R'
+        'output/logs/count_reads_per_feature.log'
     threads:
         min(32, len(all_samples) + 1)
     singularity:
