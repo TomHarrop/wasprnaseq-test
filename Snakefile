@@ -62,7 +62,7 @@ rule all:
         expand('output/030_deseq/wald/res.annot.{pl}.csv',
                pl=pipelines),
         'output/017_multiqc/multiqc_report.html',
-        'output/025_star/feature_counts.summary.csv'
+        'output/025_star/feature_counts.csv'
 
 # DE analysis
 rule de_wald:
