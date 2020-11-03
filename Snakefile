@@ -360,12 +360,12 @@ rule count_reads_per_feature:
             sample=all_samples),
         gff = gff
     output:
-        summary = 'output/025_star/feature_counts.summary.csv',
+        # summary = 'output/025_star/feature_counts.summary.csv',
         feature_counts = 'output/025_star/feature_counts.csv'
     log:
         'output/logs/count_reads_per_feature.R'
     threads:
-        min(32, workflow.cores)
+        min(32, len(all_samples) + 1)
     singularity:
         bioconductor
     script:

@@ -130,23 +130,24 @@ feature_counts <- rbindlist(feature_count_list,
                             use.names = TRUE)
 
 # PLOT PER CATEGORY
-feature_counts_long <- melt(feature_counts,
-                            id.vars = c("feature",
-                                        "gene_id",
-                                        "exon_name",
-                                        "feature_by"),
-                            measure.vars = names(bamfile_list),
-                            variable.name = "sample_name",
-                            value.name = "counts")
+# feature_counts_long <- melt(feature_counts,
+#                             id.vars = c("feature",
+#                                         "gene_id",
+#                                         "exon_name",
+#                                         "feature_by"),
+#                             measure.vars = names(bamfile_list),
+#                             variable.name = "sample_name",
+#                             value.name = "counts")
 
-pd <- feature_counts_long[, .(counts = sum(counts)),
-                          by = .(feature, sample_name)]
-pd[, counts_per_sample := sum(counts), by = sample_name]
-pd[, percentage_of_counts := counts* 100 / counts_per_sample]
+# pd <- feature_counts_long[, .(counts = sum(counts)),
+#                           by = .(feature, sample_name)]
+# pd[, counts_per_sample := sum(counts), by = sample_name]
+# pd[, percentage_of_counts := counts* 100 / counts_per_sample]
 
 # write output
-fwrite(feature_counts_long, fc_file)
-fwrite(pd, summary_file)
+fwrite(feature_counts, fc_file)
+# fwrite(feature_counts_long, fc_file)
+# fwrite(pd, summary_file)
 
 # write session info
 sessionInfo()
