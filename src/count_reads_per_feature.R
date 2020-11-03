@@ -119,7 +119,7 @@ mrna_plus1kb_gaps <- disjoin(gaps(mrna_plus1kb))
 feature_list <- list(exons = nuc_exons,
                      introns = nuc_introns,
                      mrna = mrna,
-                     mrna_gaps <- mrna_gaps,
+                     mrna_gaps = mrna_gaps,
                      intergenic = intergenic,
                      mrna_plus1kb = mrna_plus1kb,
                      mrna_plus1kb_gaps = mrna_plus1kb_gaps)
